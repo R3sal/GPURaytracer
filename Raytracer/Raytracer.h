@@ -5,7 +5,7 @@
 #include <iostream>
 
 //include the dx12 devcie class
-#include "DX12Device.h"
+#include "GPUDevice.h"
 
 
 

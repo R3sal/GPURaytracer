@@ -1,5 +1,5 @@
 //include-files
-#include "DX12GPUScheduler.h"
+#include "GPUScheduler.h"
 #include <thread>
 
 
@@ -79,10 +79,10 @@ namespace RT::GraphicsAPI
 
 
 	//public class functions
-	bool GPUScheduler::Initialize(DX12Device& rtDevice, unsigned int iNumMaxTaskRecorders)
+	bool GPUScheduler::Initialize(DX12Device* rtDevice, unsigned int iNumMaxTaskRecorders)
 	{
 		//set the member variables to their appropriate values
-		m_rtDevice = &rtDevice;
+		m_rtDevice = rtDevice;
 		m_iNumMaxTaskRecorders = iNumMaxTaskRecorders;
 		ID3D12Device8* d3dDevice = m_rtDevice->GetDevice();
 		IDXGISwapChain4* dxSwapChain = m_rtDevice->GetSwapChain();
@@ -98,7 +98,7 @@ namespace RT::GraphicsAPI
 		m_iFenceValues = new UINT64[m_iNumMaxTaskRecorders];
 		if (!m_iFenceValues) return false;
 
-		if (d3dDevice->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(&m_d3dCommandList)) < 0) return false;
+		if (d3dDevice->CreateCommandList1(0, D3D12_COMMAND_LIST_TYPE_DIRECT, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS((ID3D12CommandList**)(&m_d3dCommandList))) < 0) return false;
 		for (unsigned int i = 0; i < m_iNumMaxTaskRecorders; i++)
 		{
 			//create the command allocators and command lists
@@ -130,7 +130,8 @@ namespace RT::GraphicsAPI
 	bool GPUScheduler::Record()
 	{
 		//wait for the previous commands to finish
-		WaitForFence(m_d3dFences[m_iCurrentTaskStack], m_hFenceCompletedEvents[m_iCurrentTaskStack], m_iFenceValues[m_iCurrentTaskStack]);
+		unsigned int iPreviousTaskIndex = GetPreviousTaskIndex();
+		WaitForFence(m_d3dFences[iPreviousTaskIndex], m_hFenceCompletedEvents[iPreviousTaskIndex], m_iFenceValues[iPreviousTaskIndex]);
 
 		//start recording commands
 		if (m_d3dCommandAllocators[m_iCurrentTaskStack]->Reset() < 0) return false;
@@ -145,6 +146,10 @@ namespace RT::GraphicsAPI
 		//save the command queue in a local variable for convenience
 		ID3D12CommandQueue* d3dCommandQueue = m_rtDevice->GetCommandQueue();
 
+		//go to the next command allocator
+		unsigned int iLastTaskStack = m_iCurrentTaskStack;
+		m_iCurrentTaskStack = (m_iCurrentTaskStack + 1) % m_iNumMaxTaskRecorders;
+
 		//close the command list
 		if (m_d3dCommandList->Close() < 0) return false;
 
@@ -154,11 +159,8 @@ namespace RT::GraphicsAPI
 
 		//make a signal after this frame is finished
 		m_iCurrentFenceValue++;
-		m_iFenceValues[m_iCurrentTaskStack] = m_iCurrentFenceValue;
-		if (d3dCommandQueue->Signal(m_d3dFences[m_iCurrentTaskStack], m_iFenceValues[m_iCurrentTaskStack]) < 0) return false;
-
-		//use the next command allocator for the next bunch of commands
-		m_iCurrentTaskStack = (m_iCurrentTaskStack + 1) % m_iNumMaxTaskRecorders;
+		m_iFenceValues[iLastTaskStack] = m_iCurrentFenceValue;
+		if (d3dCommandQueue->Signal(m_d3dFences[iLastTaskStack], m_iFenceValues[iLastTaskStack]) < 0) return false;
 
 		return true;
 	}
@@ -189,5 +191,11 @@ namespace RT::GraphicsAPI
 				m_hFenceCompletedEvents[i] = nullptr;
 			}
 		}
+		if (m_d3dCommandAllocators) delete m_d3dCommandAllocators;
+		m_d3dCommandAllocators = nullptr;
+		if (m_d3dFences) delete m_d3dFences;
+		m_d3dFences = nullptr;
+		if (m_hFenceCompletedEvents) delete m_hFenceCompletedEvents;
+		m_hFenceCompletedEvents = nullptr;
 	}
 }

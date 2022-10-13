@@ -1,5 +1,5 @@
 //include-files
-#include "DX12Device.h"
+#include "GPUDevice.h"
 
 
 
@@ -18,7 +18,8 @@ namespace RT::GraphicsAPI
 		//initialize the class variables
 		m_d3dDevice(nullptr),
 		m_d3dCommandQueue(nullptr),
-		m_dxSwapChain(nullptr)
+		m_dxSwapChain(nullptr),
+		m_d3dFeatureOptions()
 	{
 
 	}
@@ -36,18 +37,25 @@ namespace RT::GraphicsAPI
 
 
 	//public class functions
-	bool DX12Device::Initialize(WND::Window& rtWindow)
+	bool DX12Device::Initialize(WND::Window* rtWindow, UINT iBufferCount)
 	{
 		//initialize the static members
+#ifndef _DEBUG
+#define DXGI_CREATE_FACTORY_DEBUG 0
+#endif
 		if (!s_dxFactory)
 		{
 			if (CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&s_dxFactory)) < 0) return false;
 		}
+#ifndef _DEBUG
+#define DXGI_CREATE_FACTORY_DEBUG 0x1
+#else
 		if (!s_d3dDebugInterface)
 		{
 			if (D3D12GetDebugInterface(IID_PPV_ARGS(&s_d3dDebugInterface)) < 0) return false;
 			s_d3dDebugInterface->EnableDebugLayer();
 		}
+#endif
 		
 		//initialize all the other members
 		if (D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&m_d3dDevice)) < 0) return false;
@@ -60,21 +68,24 @@ namespace RT::GraphicsAPI
 		if (m_d3dDevice->CreateCommandQueue(&d3dQueueDesc, IID_PPV_ARGS(&m_d3dCommandQueue)) < 0) return false;
 		
 		DXGI_SWAP_CHAIN_DESC1 dxSwapChainDesc{};
-		dxSwapChainDesc.Width = rtWindow.GetWidth();
-		dxSwapChainDesc.Height = rtWindow.GetHeight();
-		dxSwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+		dxSwapChainDesc.Width = rtWindow->GetWidth();
+		dxSwapChainDesc.Height = rtWindow->GetHeight();
+		dxSwapChainDesc.Scaling = DXGI_SCALING_NONE;
 		dxSwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
 		dxSwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		dxSwapChainDesc.SampleDesc.Count = 1;
 		dxSwapChainDesc.SampleDesc.Quality = 0;
 		dxSwapChainDesc.Stereo = false;
 		dxSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		dxSwapChainDesc.BufferCount = 3;
+		dxSwapChainDesc.BufferCount = iBufferCount;
 		dxSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 		dxSwapChainDesc.Flags = 0;
 
-		if (s_dxFactory->CreateSwapChainForHwnd(m_d3dCommandQueue, rtWindow.GetHWND(),
+		if (s_dxFactory->CreateSwapChainForHwnd(m_d3dCommandQueue, rtWindow->GetHWND(),
 			&dxSwapChainDesc, nullptr, nullptr, (IDXGISwapChain1**)(&m_dxSwapChain)) < 0) return false;
+
+		//get info about the adapter
+		if (m_d3dDevice->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &m_d3dFeatureOptions, sizeof(D3D12_FEATURE_DATA_D3D12_OPTIONS)) < 0) return false;
 
 		return true;
 	}

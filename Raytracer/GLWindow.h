@@ -8,14 +8,6 @@
 
 #define WND GLFW
 
-//link to the glfw library
-#ifdef x86
-#pragma comment(lib, "x86/GLFW/glfw3")
-#endif
-#ifdef x64
-#pragma comment(lib, "x64/GLFW/glfw3")
-#endif
-
 
 
 namespace RT::GraphicsAPI::GLFW
@@ -26,7 +18,7 @@ namespace RT::GraphicsAPI::GLFW
 	private:
 
 		//something???
-		GLFWmonitor*		m_glMonitor;
+		GLFWmonitor*	m_glMonitor;
 		GLFWwindow*		m_glWindow;
 		int		m_iWidth;
 		int		m_iHeight;

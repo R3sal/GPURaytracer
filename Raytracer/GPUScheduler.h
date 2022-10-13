@@ -1,7 +1,7 @@
 #pragma once
 
 //include our dx12 device wrapper
-#include "DX12Device.h"
+#include "GPUDevice.h"
 
 
 
@@ -38,7 +38,7 @@ namespace RT::GraphicsAPI
 
 
 		//public class functions
-		bool Initialize(DX12Device& rtDevice, unsigned int iNumMaxTaskRecorders = 1);
+		bool Initialize(DX12Device* rtDevice, unsigned int iNumMaxTaskRecorders = 1);
 		void Flush();
 		bool Record(); //begin the recording
 		bool Execute(); //end the recording and send the commands to the GPU
@@ -48,6 +48,10 @@ namespace RT::GraphicsAPI
 		//helper functions
 		DX12Device* GetDX12Device() { return m_rtDevice; };
 		ID3D12GraphicsCommandList6* GetCommandList() { return m_d3dCommandList; };
+		unsigned int GetNumMaxTasks() { return m_iNumMaxTaskRecorders; };
+		unsigned int GetPreviousTaskIndex() { return (m_iCurrentTaskStack < 1) ? m_iNumMaxTaskRecorders - 1 : m_iCurrentTaskStack - 1; };
+		unsigned int GetCurrentTaskIndex() { return m_iCurrentTaskStack; };
+		unsigned int GetNextTaskIndex() { return (m_iCurrentTaskStack + 1) % m_iNumMaxTaskRecorders; };
 
 	};
 }

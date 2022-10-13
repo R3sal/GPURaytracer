@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Headerdateien">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Ressourcendateien">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -27,7 +23,7 @@
     <ClCompile Include="GLWindow.cpp">
       <Filter>GraphicsAPI</Filter>
     </ClCompile>
-    <ClCompile Include="DX12Device.cpp">
+    <ClCompile Include="GPUDevice.cpp">
       <Filter>GraphicsAPI</Filter>
     </ClCompile>
     <ClCompile Include="Raytracer.cpp">
@@ -36,16 +32,28 @@
     <ClCompile Include="Win32Window.cpp">
       <Filter>GraphicsAPI</Filter>
     </ClCompile>
-    <ClCompile Include="DX12RenderTarget.cpp">
+    <ClCompile Include="RenderTarget.cpp">
       <Filter>GraphicsAPI</Filter>
     </ClCompile>
-    <ClCompile Include="DX12GPUScheduler.cpp">
+    <ClCompile Include="GPUScheduler.cpp">
       <Filter>GraphicsAPI</Filter>
     </ClCompile>
-    <ClCompile Include="DX12RaytracingPipeline.cpp">
+    <ClCompile Include="PipelineState.cpp">
       <Filter>GraphicsAPI</Filter>
     </ClCompile>
-    <ClCompile Include="DX12PipelineState.cpp">
+    <ClCompile Include="DXGIFormatHelper.cpp">
+      <Filter>GraphicsAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="RaytracerMesh.cpp">
+      <Filter>GraphicsAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureToScreenPass.cpp">
+      <Filter>GraphicsAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="RaytracerPipeline.cpp">
+      <Filter>GraphicsAPI</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureAtlas.cpp">
       <Filter>GraphicsAPI</Filter>
     </ClCompile>
   </ItemGroup>
@@ -53,7 +61,7 @@
     <ClInclude Include="GLWindow.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DX12Device.h">
+    <ClInclude Include="GPUDevice.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
     <ClInclude Include="Raytracer.h">
@@ -62,19 +70,31 @@
     <ClInclude Include="Win32Window.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DX12RenderTarget.h">
+    <ClInclude Include="RenderTarget.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DX12GPUScheduler.h">
+    <ClInclude Include="GPUScheduler.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DX12RaytracingPipeline.h">
+    <ClInclude Include="PipelineState.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DX12PipelineState.h">
+    <ClInclude Include="ShaderResources.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
-    <ClInclude Include="DX12ShaderResources.h">
+    <ClInclude Include="DXGIFormatHelper.h">
+      <Filter>GraphicsAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="RaytracerMesh.h">
+      <Filter>GraphicsAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureToScreenPass.h">
+      <Filter>GraphicsAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="RaytracerPipeline.h">
+      <Filter>GraphicsAPI</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureAtlas.h">
       <Filter>GraphicsAPI</Filter>
     </ClInclude>
   </ItemGroup>
@@ -88,9 +108,51 @@
     <FxCompile Include="PS_FullscreenPass.hlsl">
       <Filter>Shader</Filter>
     </FxCompile>
+    <FxCompile Include="CS_CameraRayGeneration.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_TraceRays.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_GenerateFinalImage.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_RayGeneration.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_SortCount.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_SortPrefixSum.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_SortSort.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_BVHBuildLeaves.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_BVHBuild.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="CS_GenerateMortonCodes.hlsl">
+      <Filter>Shader</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="FullscreenPass.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Raytracer.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="PerRayShading.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Random.hlsli">
+      <Filter>Shader</Filter>
+    </None>
+    <None Include="Sort.hlsli">
       <Filter>Shader</Filter>
     </None>
   </ItemGroup>

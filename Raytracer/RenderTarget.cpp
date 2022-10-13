@@ -1,5 +1,5 @@
 //include-files
-#include "DX12RenderTarget.h"
+#include "RenderTarget.h"
 
 
 
@@ -14,8 +14,7 @@ namespace RT::GraphicsAPI
 		m_d3dRTVsDescriptorHeap(nullptr),
 		m_iRTVDescriptorSize(0),
 		m_d3dBackBuffers(nullptr),
-		m_iBufferCount(0),
-		m_iCurrentBackBuffer(0)
+		m_iBufferCount(0)
 	{
 
 	}
@@ -33,11 +32,11 @@ namespace RT::GraphicsAPI
 
 
 	//public class functions
-	bool RenderTarget::Initialize(GPUScheduler& rtScheduler, unsigned int iNumBuffers)
+	bool RenderTarget::Initialize(GPUScheduler* rtScheduler)
 	{
 		//copy the contents of rtDevice
-		m_rtScheduler = &rtScheduler;
-		m_iBufferCount = iNumBuffers;
+		m_rtScheduler = rtScheduler;
+		m_iBufferCount = m_rtScheduler->GetNumMaxTasks();
 		DX12Device* rtDevice = m_rtScheduler->GetDX12Device();
 		ID3D12Device8* d3dDevice = rtDevice->GetDevice();
 		IDXGISwapChain4* dxSwapChain = rtDevice->GetSwapChain();
@@ -71,7 +70,7 @@ namespace RT::GraphicsAPI
 			//create the render target on the given back buffer (bind it to a specific spot in the descriptor handle)
 			d3dDevice->CreateRenderTargetView(m_d3dBackBuffers[i], &d3dRTVDesc, d3dCPUDescriptorHandle);
 			//offset the pointer in the descriptor handle, so the next iteration doesn't overwrite the current render target descriptor
-			d3dCPUDescriptorHandle.ptr += m_iRTVDescriptorSize;
+			d3dCPUDescriptorHandle.ptr += (SIZE_T)m_iRTVDescriptorSize;
 		}
 
 
@@ -83,13 +82,13 @@ namespace RT::GraphicsAPI
 	{
 		float fColor[4] = { fR, fG, fB, fA };
 		D3D12_CPU_DESCRIPTOR_HANDLE d3dRTVDescriptor = m_d3dRTVsDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		d3dRTVDescriptor.ptr += (SIZE_T)m_iCurrentBackBuffer * (SIZE_T)m_iRTVDescriptorSize;
+		d3dRTVDescriptor.ptr += (SIZE_T)(m_rtScheduler->GetCurrentTaskIndex()) * (SIZE_T)m_iRTVDescriptorSize;
 
 		m_rtScheduler->GetCommandList()->ClearRenderTargetView(d3dRTVDescriptor, fColor, 0, nullptr);
 	}
 
 
-	void RenderTarget::Bind(bool bClearTargets)
+	void RenderTarget::BeginRender(bool bClearTargets)
 	{
 		ID3D12GraphicsCommandList6* d3dCommandList = m_rtScheduler->GetCommandList();
 
@@ -99,7 +98,7 @@ namespace RT::GraphicsAPI
 		D3D12_RESOURCE_BARRIER d3dResourceBarrier{};
 		d3dResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		d3dResourceBarrier.Transition.pResource = m_d3dBackBuffers[m_iCurrentBackBuffer];
+		d3dResourceBarrier.Transition.pResource = m_d3dBackBuffers[m_rtScheduler->GetCurrentTaskIndex()];
 		d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
 		d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
@@ -107,7 +106,7 @@ namespace RT::GraphicsAPI
 
 		//set the different components of the pipeline
 		D3D12_CPU_DESCRIPTOR_HANDLE d3dRTVDescriptor = m_d3dRTVsDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
-		d3dRTVDescriptor.ptr += (SIZE_T)m_iCurrentBackBuffer * (SIZE_T)m_iRTVDescriptorSize;
+		d3dRTVDescriptor.ptr += (SIZE_T)(m_rtScheduler->GetCurrentTaskIndex()) * (SIZE_T)m_iRTVDescriptorSize;
 
 		//d3dCommandList->OMSetDepthBounds(0.0f, 1.0f);
 		//d3dCommandList->OMSetStencilRef(0);
@@ -123,7 +122,7 @@ namespace RT::GraphicsAPI
 	}
 
 
-	void RenderTarget::Unbind()
+	void RenderTarget::EndRender()
 	{
 		ID3D12GraphicsCommandList6* d3dCommandList = m_rtScheduler->GetCommandList();
 
@@ -137,14 +136,11 @@ namespace RT::GraphicsAPI
 		D3D12_RESOURCE_BARRIER d3dResourceBarrier{};
 		d3dResourceBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		d3dResourceBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-		d3dResourceBarrier.Transition.pResource = m_d3dBackBuffers[m_iCurrentBackBuffer];
+		d3dResourceBarrier.Transition.pResource = m_d3dBackBuffers[m_rtScheduler->GetCurrentTaskIndex()];
 		d3dResourceBarrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 		d3dResourceBarrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 		d3dResourceBarrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
 		d3dCommandList->ResourceBarrier(1, &d3dResourceBarrier);
-
-		//next frame --> next buffer
-		m_iCurrentBackBuffer = (m_iCurrentBackBuffer + 1) % m_iBufferCount;
 	}
 
 

@@ -8,7 +8,7 @@
 #define GROUPSIZE_Y 1
 #define GROUPSIZE_Z 1
 
-#define USE_BVH 0
+#define USE_BVH 1
 
 
 struct TraceRaysInfo
@@ -189,7 +189,7 @@ void main(CSInput Input)
 		{
 			AABBIndices[0] = TrunkAABB.Padding.y;
 			AABBIndices[1] = TrunkAABB.Padding.x;
-			NumAABBs = 0;
+			NumAABBs = 2;
 		}
 		AABBResult = AABBIntersectResult;
 		
@@ -298,8 +298,9 @@ void main(CSInput Input)
 		}
 		
 		ScatteredLight[Index] = Scattered;
-		EmittedLight[Index] = Emitted;
-		//EmittedLight[Index] = float4(abs(float(AABBResult)) / 2e30f, 0.0f, 0.0f, 0.0f);
+		//EmittedLight[Index] = Emitted;
+		EmittedLight[Index] = float4((float(AABBResult)) * 0.01f, 0.0f, 0.0f, 0.0f);
+		//EmittedLight[Index] = float4(float(TrunkAABB.Padding.y) * 0.0003, 0.0f, 0.0f, 0.0f);
 		/*/if (Input.GlobalThreadID.x < 4096)
 		{
 			AABB CurrAABB = BoundingVolumeHierarchy[Input.GlobalThreadID.x + 1];

@@ -31,7 +31,7 @@ void main(CSInput Input)
 		uint Index2 = Index1 + 1;
 		AABB AABB1 = BoundingVolumeHierarchy[Index1];
 		AABB AABB2 = AABB1;
-		if (Index2 < InfoBuffer.NumChildren)
+		if ((Index2 - InfoBuffer.PreviousIndex) < InfoBuffer.NumChildren)
 		{
 			AABB2 = BoundingVolumeHierarchy[Index2];
 		}
@@ -43,6 +43,6 @@ void main(CSInput Input)
 		AABB1.Max = max(AABB1.Max, AABB2.Max);
 		AABB1.Padding.x = Index1;
 		AABB1.Padding.y = Index2;
-		//BoundingVolumeHierarchy[InfoBuffer.CurrentIndex + Input.GlobalThreadID.x] = AABB1;
+		BoundingVolumeHierarchy[InfoBuffer.CurrentIndex + Input.GlobalThreadID.x] = AABB1;
 	}
 }

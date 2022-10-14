@@ -53,8 +53,8 @@ void main(CSInput Input)
 		
 		//if (length(NewColor.xyz) > 100.0f)
 		//	DisplayedColor = float4(0.0f, 0.0f, 0.0f, 0.0f);
-		//OutputTexture[Input.GlobalThreadID.xy] = DisplayedColor;
 		OutputTexture[Input.GlobalThreadID.xy] = NewColor;
+		//OutputTexture[Input.GlobalThreadID.xy] = DisplayedColor;
 		//OutputTexture[Input.GlobalThreadID.xy] = DisplayedColor / (1.0f + DisplayedColor); // basic tone mapping
 		ResultBuffer[ResultBufferIndex] = TotalColor;
 	}

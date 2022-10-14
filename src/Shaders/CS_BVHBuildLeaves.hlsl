@@ -31,14 +31,14 @@ void main(CSInput Input)
 	if (Input.GlobalThreadID.x < ((InfoBuffer.NumChildren + 1) / 2))
 	{
 		uint CurrentIndices[2];
-		CurrentIndices[0] = MortonCodes[2 * Input.GlobalThreadID.x].x;
+		CurrentIndices[0] = MortonCodes[2 * Input.GlobalThreadID.x].y;
 		CurrentIndices[1] = 0xffffffff;
 		
 		uint Iterations = 3;
 		if ((2 * Input.GlobalThreadID.x + 1) < InfoBuffer.NumChildren)
 		{
 			Iterations = 6;
-			CurrentIndices[1] = MortonCodes[2 * Input.GlobalThreadID.x + 1].x;
+			CurrentIndices[1] = MortonCodes[2 * Input.GlobalThreadID.x + 1].y;
 		}
 		
 		//get the minimum and maximum positions

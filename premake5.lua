@@ -19,7 +19,8 @@ project "GPURaytracer"
         "src/**.h",
         "src/**.cpp",
         "src/**.hlsli",
-        "src/**.hlsl"
+        "src/**.hlsl",
+        "lib/**.lib"
     }
 
     includedirs
@@ -28,9 +29,14 @@ project "GPURaytracer"
         "include"
     }
 
+    libdirs
+    {
+        "lib/%{cfg.platform}"
+    }
+
     links
     {
-        "lib/%{cfg.platform}/GLFW/glfw3.lib"
+        "GLFW/glfw3.lib"
     }
 
     defines

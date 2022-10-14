@@ -81,7 +81,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+# *.obj we still want to include our .obj model files, it will still be ignored by git as it is in the "bin" folder
 *.iobj
 *.pch
 *.pdb

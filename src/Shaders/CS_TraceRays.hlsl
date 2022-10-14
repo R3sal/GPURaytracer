@@ -8,7 +8,7 @@
 #define GROUPSIZE_Y 1
 #define GROUPSIZE_Z 1
 
-#define USE_BVH 1
+#define USE_BVH 0
 
 
 struct TraceRaysInfo
@@ -90,7 +90,7 @@ float IntersectAABB(Ray TestRay, AABB TestAABB)
 	
 	if ((tMax < tMin) || (tMax <= 0) || (tMin < TestRay.TMin) || (tMax > TestRay.TMax))
 	{
-		tMin = -1.0f;
+		tMin = 1e30f;
 	}
 	
 	return tMin;
@@ -185,7 +185,7 @@ void main(CSInput Input)
 		AABB TrunkAABB = BoundingVolumeHierarchy[0];
 		float AABBIntersectResult = IntersectAABB(CurrentRay, TrunkAABB);
 		
-		if (AABBIntersectResult > 0.0f)
+		if (AABBIntersectResult != 1e30f)
 		{
 			AABBIndices[0] = TrunkAABB.Padding.y;
 			AABBIndices[1] = TrunkAABB.Padding.x;
@@ -198,7 +198,7 @@ void main(CSInput Input)
 			AABB CurrentAABB = BoundingVolumeHierarchy[AABBIndices[NumAABBs - 1]];
 			float CurrentResult = IntersectAABB(CurrentRay, CurrentAABB);
 			bool RemoveTestedAABBs = false;
-			if ((CurrentResult > 0.0f) && (CurrentResult < Result.x))
+			if ((CurrentResult != 1e30f) && (CurrentResult < Result.x))
 			{
 				NumTestedAABBs++;
 				AABBIntersectResult = min(AABBIntersectResult, CurrentResult);
@@ -298,13 +298,13 @@ void main(CSInput Input)
 		}
 		
 		ScatteredLight[Index] = Scattered;
-		//EmittedLight[Index] = Emitted;
-		//EmittedLight[Index] = float4(float(AABBResult) / 10.0f, 0.0f, 0.0f, 0.0f);
-		/**/if (Input.GlobalThreadID.x < 4096)
+		EmittedLight[Index] = Emitted;
+		//EmittedLight[Index] = float4(abs(float(AABBResult)) / 2e30f, 0.0f, 0.0f, 0.0f);
+		/*/if (Input.GlobalThreadID.x < 4096)
 		{
 			AABB CurrAABB = BoundingVolumeHierarchy[Input.GlobalThreadID.x + 1];
-			EmittedLight[Input.GlobalThreadID.x * 8] = float4(0.0f, float(CurrAABB.Padding.x & 0x7fffffff) / 1.0f, 0.0f, 0.0f);
-			EmittedLight[Input.GlobalThreadID.x * 8 + 4] = float4(0.0f, float(CurrAABB.Padding.y & 0x7fffffff) / 1.0f, 0.0f, 0.0f);
+			EmittedLight[Input.GlobalThreadID.x * 8] = float4(0.0f, float(CurrAABB.Padding.x & 0x7fffffff) / 1000000000.0f, 0.0f, 0.0f);
+			EmittedLight[Input.GlobalThreadID.x * 8 + 4] = float4(0.0f, float(CurrAABB.Padding.y & 0x7fffffff) / 1000000000.0f, 0.0f, 0.0f);
 		}/**/
 	}
 }

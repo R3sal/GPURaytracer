@@ -58,12 +58,11 @@ void main(CSInput Input)
 		float3 Centroid = 0.333333f * (Vertex1.Position + Vertex2.Position + Vertex3.Position);
 		
 		//normalize the centroid
-		float3 NormalizedCentroid = saturate((Centroid - InfoBuffer.SceneMin.xyz) / (InfoBuffer.SceneMax.xyz - InfoBuffer.SceneMin.xyz)) * 1023.0f;
-		uint3 IntegerizedCentroid = uint3(NormalizedCentroid); //hlsl limit on maximum written float
+		uint3 NormalizedCentroid = uint3(saturate((Centroid - InfoBuffer.SceneMin.xyz) / (InfoBuffer.SceneMax.xyz - InfoBuffer.SceneMin.xyz)) * 1023.0f);
 		
 		//generate the morton code
 		//also based on https://pbr-book.org/3ed-2018/Primitives_and_Intersection_Acceleration/Bounding_Volume_Hierarchies
-		uint3 ShiftedCentroid = LeftShift3(IntegerizedCentroid);
+		uint3 ShiftedCentroid = LeftShift3(NormalizedCentroid);
 		uint MortonCode = (ShiftedCentroid.z << 2) | (ShiftedCentroid.y << 1) | ShiftedCentroid.x;
 
 		//store the generated morton code

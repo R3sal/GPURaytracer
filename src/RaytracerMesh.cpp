@@ -177,7 +177,7 @@ namespace RT::GraphicsAPI
 		tolReaderConfig.triangulate = false;
 		tolReaderConfig.triangulation_method = "simple";
 		tolReaderConfig.vertex_color = false;
-		tolReaderConfig.mtl_search_path = "./";
+		tolReaderConfig.mtl_search_path = "";
 
 		tinyobj::ObjReader tolReader{};
 		if (!(tolReader.ParseFromFile(sFileName, tolReaderConfig)))

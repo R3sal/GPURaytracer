@@ -22,13 +22,13 @@ void main(CSInput Input)
 	
 	for (uint i = 0; i < InfoBuffer.NumElements; i++)
 	{
-		//uint2 CurrentElement = TempMortonCodes[i].xy;
-		//uint CurrentIndex = (CurrentElement.x >> (8 * InfoBuffer.SortPassIndex)) & 0xff;
-		//if (CurrentIndex == Input.GlobalThreadID.x)
-		//{
-		//	MortonCodes[NextElementIndex].xy = CurrentElement;
-		//	NextElementIndex++;
-		//}
+		uint2 CurrentElement = TempMortonCodes[i].xy;
+		uint CurrentIndex = (CurrentElement.x >> (8 * InfoBuffer.SortPassIndex)) & 0xff;
+		if (CurrentIndex == Input.GlobalThreadID.x)
+		{
+			MortonCodes[NextElementIndex].xy = CurrentElement;
+			NextElementIndex++;
+		}
 	}
 	
 	CodeFrequencies[Input.GlobalThreadID.x].x = 0;

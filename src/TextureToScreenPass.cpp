@@ -50,8 +50,8 @@ namespace RT::GraphicsAPI
 		m_rtPipelineState->SetViewportScissor((FLOAT)iWidth, (FLOAT)iHeight);
 		m_rtPipelineState->SetRootSignature(d3dRootSignature);
 		m_rtPipelineState->SetRenderTargets(&dxBackBufferFormat);
-		if (!(m_rtPipelineState->SetVS("VS_FullscreenPass.cso"))) return false;
-		if (!(m_rtPipelineState->SetPS("PS_FullscreenPass.cso"))) return false;
+		if (!(m_rtPipelineState->SetVS("src/Shaders/bin/VS_FullscreenPass.cso"))) return false;
+		if (!(m_rtPipelineState->SetPS("src/Shaders/bin/PS_FullscreenPass.cso"))) return false;
 		if (!(m_rtPipelineState->CreatePSO())) return false;
 		
 		if (!(m_rtRenderTarget->Initialize(m_rtFrameScheduler))) return false;

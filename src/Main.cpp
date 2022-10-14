@@ -25,7 +25,7 @@ int main()
 	std::cout << rtDevice.Initialize(&rtWindow, RT::GraphicsAPI::NUM_BUFFERS) << "\n";
 
 	RT::GraphicsAPI::RaytracerPipeline rtTracer = RT::GraphicsAPI::RaytracerPipeline();
-	std::cout << rtTracer.Initialize(&rtDevice, RT::GraphicsAPI::LoadMeshFromFile("testobject5_1.obj")) << "\n";
+	std::cout << rtTracer.Initialize(&rtDevice, RT::GraphicsAPI::LoadMeshFromFile("src/Assets/testobject5_1.obj")) << "\n";
 	
 	//std::thread(RenderFunction);
 	std::chrono::steady_clock stdClock;

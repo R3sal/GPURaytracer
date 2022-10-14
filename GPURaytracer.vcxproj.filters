@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{EFAC8DF2-5B8C-0C8E-64A4-9764D00273EF}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\DXGIFormatHelper.h" />
+    <ClInclude Include="src\GLWindow.h" />
+    <ClInclude Include="src\GPUDevice.h" />
+    <ClInclude Include="src\GPUScheduler.h" />
+    <ClInclude Include="src\Header.h" />
+    <ClInclude Include="src\PipelineState.h" />
+    <ClInclude Include="src\Raytracer.h" />
+    <ClInclude Include="src\RaytracerMesh.h" />
+    <ClInclude Include="src\RaytracerPipeline.h" />
+    <ClInclude Include="src\RenderTarget.h" />
+    <ClInclude Include="src\ShaderResources.h" />
+    <ClInclude Include="src\TextureAtlas.h" />
+    <ClInclude Include="src\TextureToScreenPass.h" />
+    <ClInclude Include="src\Win32Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\DXGIFormatHelper.cpp" />
+    <ClCompile Include="src\GLWindow.cpp" />
+    <ClCompile Include="src\GPUDevice.cpp" />
+    <ClCompile Include="src\GPUScheduler.cpp" />
+    <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\PipelineState.cpp" />
+    <ClCompile Include="src\Raytracer.cpp" />
+    <ClCompile Include="src\RaytracerMesh.cpp" />
+    <ClCompile Include="src\RaytracerPipeline.cpp" />
+    <ClCompile Include="src\RenderTarget.cpp" />
+    <ClCompile Include="src\TextureAtlas.cpp" />
+    <ClCompile Include="src\TextureToScreenPass.cpp" />
+    <ClCompile Include="src\Win32Window.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Shaders\CS_BVHBuild.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_BVHBuildLeaves.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_CameraRayGeneration.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_GenerateFinalImage.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_GenerateMortonCodes.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_Intersection.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_SortCount.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_SortPrefixSum.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_SortSort.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\CS_TraceRays.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\PS_FullscreenPass.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Shaders\VS_FullscreenPass.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Shaders\FullscreenPass.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\PerRayShading.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\Random.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\Raytracer.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="src\Shaders\Sort.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
+</Project>

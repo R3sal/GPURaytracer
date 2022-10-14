@@ -10,7 +10,7 @@ Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 1.000000
 illum 2
-map_Kd src/Assets/Testure1.png
+map_Kd assets/Testure1.png
 
 newmtl Material.002
 Ns 867.454773

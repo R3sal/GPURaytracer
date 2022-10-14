@@ -59,7 +59,7 @@ namespace RT::GraphicsAPI
 		m_rtCameraRayGenState = new PipelineState();
 		m_rtCameraRayGenState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtCameraRayGenState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtCameraRayGenState->SetCS("src/Shaders/bin/CS_CameraRayGeneration.cso"))) return false;
+		if (!(m_rtCameraRayGenState->SetCS("shader/shaderbin/CS_CameraRayGeneration.cso"))) return false;
 		if (!(m_rtCameraRayGenState->CreatePSO())) return false;
 
 		//create the resources
@@ -204,7 +204,7 @@ namespace RT::GraphicsAPI
 		m_rtGenMortonCodeState = new PipelineState();
 		m_rtGenMortonCodeState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtGenMortonCodeState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtGenMortonCodeState->SetCS("src/Shaders/bin/CS_GenerateMortonCodes.cso"))) return false;
+		if (!(m_rtGenMortonCodeState->SetCS("shader/shaderbin/CS_GenerateMortonCodes.cso"))) return false;
 		if (!(m_rtGenMortonCodeState->CreatePSO())) return false;
 
 		rtRootSignatures.Release();
@@ -215,7 +215,7 @@ namespace RT::GraphicsAPI
 		m_rtSortCountState = new PipelineState();
 		m_rtSortCountState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtSortCountState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtSortCountState->SetCS("src/Shaders/bin/CS_SortCount.cso"))) return false;
+		if (!(m_rtSortCountState->SetCS("shader/shaderbin/CS_SortCount.cso"))) return false;
 		if (!(m_rtSortCountState->CreatePSO())) return false;
 
 		rtRootSignatures.Release();
@@ -224,7 +224,7 @@ namespace RT::GraphicsAPI
 		m_rtSortPrefixSumState = new PipelineState();
 		m_rtSortPrefixSumState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtSortPrefixSumState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtSortPrefixSumState->SetCS("src/Shaders/bin/CS_SortPrefixSum.cso"))) return false;
+		if (!(m_rtSortPrefixSumState->SetCS("shader/shaderbin/CS_SortPrefixSum.cso"))) return false;
 		if (!(m_rtSortPrefixSumState->CreatePSO())) return false;
 
 		rtRootSignatures.Release();
@@ -235,7 +235,7 @@ namespace RT::GraphicsAPI
 		m_rtSortSortState = new PipelineState();
 		m_rtSortSortState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtSortSortState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtSortSortState->SetCS("src/Shaders/bin/CS_SortSort.cso"))) return false;
+		if (!(m_rtSortSortState->SetCS("shader/shaderbin/CS_SortSort.cso"))) return false;
 		if (!(m_rtSortSortState->CreatePSO())) return false;
 
 		//create the constant buffers
@@ -432,7 +432,7 @@ namespace RT::GraphicsAPI
 		m_rtBuildLeavesState = new PipelineState();
 		m_rtBuildLeavesState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtBuildLeavesState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtBuildLeavesState->SetCS("src/Shaders/bin/CS_BVHBuildLeaves.cso"))) return false;
+		if (!(m_rtBuildLeavesState->SetCS("shader/shaderbin/CS_BVHBuildLeaves.cso"))) return false;
 		if (!(m_rtBuildLeavesState->CreatePSO())) return false;
 
 		rtRootSignatures.Release();
@@ -441,7 +441,7 @@ namespace RT::GraphicsAPI
 		m_rtBuildState = new PipelineState();
 		m_rtBuildState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtBuildState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtBuildState->SetCS("src/Shaders/bin/CS_BVHBuild.cso"))) return false;
+		if (!(m_rtBuildState->SetCS("shader/shaderbin/CS_BVHBuild.cso"))) return false;
 		if (!(m_rtBuildState->CreatePSO())) return false;
 
 		//create the constant buffers
@@ -622,7 +622,7 @@ namespace RT::GraphicsAPI
 		m_rtTraceRaysState = new PipelineState();
 		m_rtTraceRaysState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtTraceRaysState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtTraceRaysState->SetCS("src/Shaders/bin/CS_TraceRays.cso"))) return false;
+		if (!(m_rtTraceRaysState->SetCS("shader/shaderbin/CS_TraceRays.cso"))) return false;
 		if (!(m_rtTraceRaysState->CreatePSO())) return false;
 
 		//create the resources
@@ -777,7 +777,7 @@ namespace RT::GraphicsAPI
 		m_rtGenerateImageState = new PipelineState();
 		m_rtGenerateImageState->Initialize(m_rtFrameScheduler, true);
 		if (!(m_rtGenerateImageState->SetRootSignature(rtRootSignatures))) return false;
-		if (!(m_rtGenerateImageState->SetCS("src/Shaders/bin/CS_GenerateFinalImage.cso"))) return false;
+		if (!(m_rtGenerateImageState->SetCS("shader/shaderbin/CS_GenerateFinalImage.cso"))) return false;
 		if (!(m_rtGenerateImageState->CreatePSO())) return false;
 
 		//create the resources

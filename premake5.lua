@@ -18,8 +18,8 @@ project "GPURaytracer"
     {
         "src/**.h",
         "src/**.cpp",
-        "src/**.hlsli",
-        "src/**.hlsl",
+        "shader/**.hlsli",
+        "shader/**.hlsl",
         "lib/**.lib"
     }
 
@@ -63,7 +63,7 @@ project "GPURaytracer"
     -- configure shader compiler
     filter "files:**.hlsl"
         shadermodel "6.0"
-        shaderobjectfileoutput("%{file.directory}/bin/%{file.basename}.cso")
+        shaderobjectfileoutput("%{file.directory}/shaderbin/%{file.basename}.cso")
     filter "files:**CS_*.hlsl"
         shadertype "Compute"
     filter "files:**VS_*.hlsl"

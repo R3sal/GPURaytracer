@@ -21,7 +21,7 @@ namespace RT::GraphicsAPI
 	//global constants
 	//customizeable parameters
 	const unsigned int MAX_RAYS_PER_PIXEL = 4; //number of rays per pixel, the higher this value, the better AA and DOF effects will be
-	const unsigned int MAX_RAY_DEPTH = 3; //after shooting this number of rays, we return to shooting a ray from the camera
+	const unsigned int MAX_RAY_DEPTH = 2; //after shooting this number of rays, we return to shooting a ray from the camera
 	const float AA_SAMPLE_SPREAD = 1.5f; //anti-aliasing: the bigger the value, the blurrier the image, disabled at 0.0f, default is 1.0f
 	const float DOF_SAMPLE_SPREAD = 0.0f; //depth of field: the bigger the value, the stronger the DOF effect, disabled at 0.0f, default is 1.0f
 

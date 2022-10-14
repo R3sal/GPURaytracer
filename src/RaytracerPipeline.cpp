@@ -505,11 +505,11 @@ namespace RT::GraphicsAPI
 
 		//build the rest of the tree
 		uint32_t iIndex = 0;
-		for (uint32_t i = m_rtBVHInfoData.NumChildren; i != 2; i = (i + 1) / 2)
+		for (; m_rtBVHInfoData.NumChildren != 2;)
 		{
 			//update the info buffer
-			m_rtBVHInfoData.NumChildren = i;
 			m_rtBVHBuildInfoBuffer[iIndex]->Update(&m_rtBVHInfoData);
+			m_rtBVHInfoData.NumChildren = (m_rtBVHInfoData.NumChildren + 1) / 2; //refresh the value after updating the buffer with it
 
 			//the compute pass
 			m_rtBuildState->Bind();
@@ -521,7 +521,7 @@ namespace RT::GraphicsAPI
 			d3dUAVBarrier[0].UAV.pResource = m_rtBVHBuffer->GetResources()[0];
 			d3dCommandList->ResourceBarrier(1, d3dUAVBarrier);
 
-			d3dCommandList->Dispatch((((i + 1) / 2) + 255) / 256, 1, 1);
+			d3dCommandList->Dispatch((m_rtBVHInfoData.NumChildren + 255) / 256, 1, 1);
 
 			d3dUAVBarrier[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 			d3dUAVBarrier[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -530,7 +530,7 @@ namespace RT::GraphicsAPI
 
 			//update some info data
 			m_rtBVHInfoData.PreviousIndex = m_rtBVHInfoData.CurrentIndex;
-			m_rtBVHInfoData.CurrentIndex += i;
+			m_rtBVHInfoData.CurrentIndex += m_rtBVHInfoData.NumChildren;
 
 			iIndex++;
 		}

@@ -88,7 +88,7 @@ float IntersectAABB(Ray TestRay, AABB TestAABB)
 	float tMin = max(tMinVals.x, max(tMinVals.y, tMinVals.z));
 	float tMax = min(tMaxVals.x, min(tMaxVals.y, tMaxVals.z));
 	
-	if ((tMax < tMin) || (tMax <= 0) || (tMin < TestRay.TMin) || (tMax > TestRay.TMax))
+	if ((tMax < tMin) || (tMax <= 0) || (tMax < TestRay.TMin) || (tMin > TestRay.TMax))
 	{
 		tMin = 1e30f;
 	}
@@ -179,19 +179,14 @@ void main(CSInput Input)
 		uint AABBIndices[48];
 		uint NumAABBs = 0;
 		
-		uint NumTestedAABBs = 0;
-		float AABBResult = 1e30f;
-		
 		AABB TrunkAABB = BoundingVolumeHierarchy[0];
-		float AABBIntersectResult = IntersectAABB(CurrentRay, TrunkAABB);
 		
-		if (AABBIntersectResult != 1e30f)
+		if (IntersectAABB(CurrentRay, TrunkAABB) != 1e30f)
 		{
 			AABBIndices[0] = TrunkAABB.Padding.y;
 			AABBIndices[1] = TrunkAABB.Padding.x;
 			NumAABBs = 2;
 		}
-		AABBResult = AABBIntersectResult;
 		
 		while (NumAABBs > 0)
 		{
@@ -200,8 +195,6 @@ void main(CSInput Input)
 			bool RemoveTestedAABBs = false;
 			if ((CurrentResult != 1e30f) && (CurrentResult < Result.x))
 			{
-				NumTestedAABBs++;
-				AABBIntersectResult = min(AABBIntersectResult, CurrentResult);
 				AABBIndices[NumAABBs - 1] |= 0x80000000; //indicate that the current AABB was tested for intersection
 				if (CurrentAABB.Padding.x & 0x80000000)
 				{
@@ -211,10 +204,6 @@ void main(CSInput Input)
 						CheckIntersection(CurrentRay, CurrentAABB.Padding.y & 0x7fffffff, Result, CurrentIndices);
 					}
 					RemoveTestedAABBs = true;
-					if (CurrentResult < AABBResult)
-					{
-						AABBResult = CurrentResult;
-					}
 				}
 				else
 				{
@@ -229,6 +218,7 @@ void main(CSInput Input)
 						AABBIndices[NumAABBs + 1] = CurrentAABB.Padding.x;
 						NumAABBs += 2;
 					}
+
 				}
 			}
 			else
@@ -298,14 +288,6 @@ void main(CSInput Input)
 		}
 		
 		ScatteredLight[Index] = Scattered;
-		//EmittedLight[Index] = Emitted;
-		EmittedLight[Index] = float4((float(AABBResult)) * 0.01f, 0.0f, 0.0f, 0.0f);
-		//EmittedLight[Index] = float4(float(TrunkAABB.Padding.y) * 0.0003, 0.0f, 0.0f, 0.0f);
-		/*/if (Input.GlobalThreadID.x < 4096)
-		{
-			AABB CurrAABB = BoundingVolumeHierarchy[Input.GlobalThreadID.x + 1];
-			EmittedLight[Input.GlobalThreadID.x * 8] = float4(0.0f, float(CurrAABB.Padding.x & 0x7fffffff) / 1000000000.0f, 0.0f, 0.0f);
-			EmittedLight[Input.GlobalThreadID.x * 8 + 4] = float4(0.0f, float(CurrAABB.Padding.y & 0x7fffffff) / 1000000000.0f, 0.0f, 0.0f);
-		}/**/
+		EmittedLight[Index] = Emitted;
 	}
 }

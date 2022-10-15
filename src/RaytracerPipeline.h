@@ -4,7 +4,8 @@
 
 #include <DirectXMath.h>
 
-//include the dx12 devcie class
+//include the dx12 device class
+#include "Settings.h"
 #include "GPUDevice.h"
 #include "GPUScheduler.h"
 #include "RenderTarget.h"
@@ -20,13 +21,13 @@ namespace RT::GraphicsAPI
 {
 	//global constants
 	//customizeable parameters
-	const unsigned int MAX_RAYS_PER_PIXEL = 4; //number of rays per pixel, the higher this value, the better AA and DOF effects will be
-	const unsigned int MAX_RAY_DEPTH = 3; //after shooting this number of rays, we return to shooting a ray from the camera
-	const float AA_SAMPLE_SPREAD = 1.5f; //anti-aliasing: the bigger the value, the blurrier the image, disabled at 0.0f, default is 1.0f
-	const float DOF_SAMPLE_SPREAD = 0.0f; //depth of field: the bigger the value, the stronger the DOF effect, disabled at 0.0f, default is 1.0f
+	const unsigned int MAX_RAYS_PER_PIXEL = RT_MAX_RAYS_PER_PIXEL; //number of rays per pixel, the higher this value, the better AA and DOF effects will be
+	const unsigned int MAX_RAY_DEPTH = RT_MAX_RAY_DEPTH; //after shooting this number of rays, we return to shooting a ray from the camera
+	const float AA_SAMPLE_SPREAD = RT_AA_SAMPLE_SPREAD; //anti-aliasing: the bigger the value, the blurrier the image, disabled at 0.0f, default is 1.0f
+	const float DOF_SAMPLE_SPREAD = RT_DOF_SAMPLE_SPREAD; //depth of field: the bigger the value, the stronger the DOF effect, disabled at 0.0f, default is 1.0f
 
 	//strictly defined parameters
-	const unsigned int MAX_RAYS = WINDOW_WIDTH * WINDOW_HEIGHT * MAX_RAYS_PER_PIXEL;
+	const unsigned int MAX_RAYS = RT_WINDOW_WIDTH * RT_WINDOW_HEIGHT * MAX_RAYS_PER_PIXEL;
 	const unsigned int SIZEOF_RAY = 8 * 4;
 	const unsigned int SIZEOF_RAYPIXEL = 4 * 4;
 

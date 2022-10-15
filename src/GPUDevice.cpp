@@ -37,7 +37,7 @@ namespace RT::GraphicsAPI
 
 
 	//public class functions
-	bool DX12Device::Initialize(WND::Window* rtWindow, UINT iBufferCount)
+	bool DX12Device::Initialize(WND::Window* rtWindow)
 	{
 		//initialize the static members
 #ifndef _DEBUG
@@ -77,7 +77,7 @@ namespace RT::GraphicsAPI
 		dxSwapChainDesc.SampleDesc.Quality = 0;
 		dxSwapChainDesc.Stereo = false;
 		dxSwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		dxSwapChainDesc.BufferCount = iBufferCount;
+		dxSwapChainDesc.BufferCount = RT_NUM_BUFFERS;
 		dxSwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
 		dxSwapChainDesc.Flags = 0;
 

@@ -78,7 +78,7 @@ namespace RT::GraphicsAPI
 		if (!(m_rtRayPixelsBuffer->Initialize(m_rtFrameScheduler, SIZEOF_RAYPIXEL, MAX_RAYS, DescriptorHeapInfo(m_rtUAVDescriptorHeap, 2)))) return false;
 
 		//store the info data and make it visible to the gpu
-		float fAspectRatio = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
+		float fAspectRatio = (float)RT_WINDOW_WIDTH / (float)RT_WINDOW_HEIGHT;
 		DirectX::XMVECTOR xmDeterminant{};
 		DirectX::XMMATRIX xmInverseProjectionMatrix = DirectX::XMMatrixInverse(&xmDeterminant, DirectX::XMMatrixTranspose(
 			DirectX::XMMatrixPerspectiveFovLH(rtCameraData.VerticalFOV, fAspectRatio, rtCameraData.NearZ, rtCameraData.FarZ)));
@@ -87,8 +87,8 @@ namespace RT::GraphicsAPI
 
 		DirectX::XMStoreFloat4x4(&(m_rtInfoData.InverseView), xmInverseViewMatrix);
 		DirectX::XMStoreFloat4x4(&(m_rtInfoData.InverseProjection), xmInverseProjectionMatrix);
-		m_rtInfoData.ScreenSize.x = WINDOW_WIDTH;
-		m_rtInfoData.ScreenSize.y = WINDOW_HEIGHT;
+		m_rtInfoData.ScreenSize.x = RT_WINDOW_WIDTH;
+		m_rtInfoData.ScreenSize.y = RT_WINDOW_HEIGHT;
 		m_rtInfoData.AASampleSpread = AA_SAMPLE_SPREAD;
 		m_rtInfoData.DOFSampleSpread = DOF_SAMPLE_SPREAD;
 		m_rtInfoData.MaxRaysPerPixel = MAX_RAYS_PER_PIXEL;
@@ -133,7 +133,7 @@ namespace RT::GraphicsAPI
 		d3dCommandList->ResourceBarrier(3, d3dUAVBarriers);
 
 		//dispatch the workload
-		d3dCommandList->Dispatch((WINDOW_WIDTH + 15) / 16, (WINDOW_HEIGHT + 15) / 16, 1);
+		d3dCommandList->Dispatch((RT_WINDOW_WIDTH + 15) / 16, (RT_WINDOW_HEIGHT + 15) / 16, 1);
 
 		d3dUAVBarriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		d3dUAVBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -669,8 +669,8 @@ namespace RT::GraphicsAPI
 		if (!(m_rtTextures->Initialize(m_rtFrameScheduler, DescriptorHeapInfo(m_rtUAVDescriptorHeap, 7)))) return false;
 		
 		//store the info data and make it visible to the gpu
-		m_rtInfoData.ScreenDimensions.x = WINDOW_WIDTH;
-		m_rtInfoData.ScreenDimensions.y = WINDOW_HEIGHT;
+		m_rtInfoData.ScreenDimensions.x = RT_WINDOW_WIDTH;
+		m_rtInfoData.ScreenDimensions.y = RT_WINDOW_HEIGHT;
 		m_rtInfoData.NumIndices = (uint32_t)(m_rtMesh->GetIndexCount());
 		m_rtInfoData.NumRays = MAX_RAYS;
 		m_rtInfoData.MaxRaysPerPixel = MAX_RAYS_PER_PIXEL;
@@ -789,14 +789,14 @@ namespace RT::GraphicsAPI
 		if (!m_rtOutputTexture) return false;
 
 		if (!(m_rtGenerateImageInfoBuffer->Initialize(m_rtFrameScheduler, sizeof(GenerateFinalImageInfo)))) return false;
-		if (!(m_rtResultBuffer->Initialize(m_rtFrameScheduler, 16, WINDOW_WIDTH * WINDOW_HEIGHT,
+		if (!(m_rtResultBuffer->Initialize(m_rtFrameScheduler, 16, RT_WINDOW_WIDTH * RT_WINDOW_HEIGHT,
 			DescriptorHeapInfo(m_rtUAVDescriptorHeap, 5)))) return false;
 		if (!(m_rtOutputTexture->Initialize(m_rtFrameScheduler, dxTargetFormat,
-			WINDOW_WIDTH, WINDOW_HEIGHT, 1, DescriptorHeapInfo(m_rtUAVDescriptorHeap, 6)))) return false;
+			RT_WINDOW_WIDTH, RT_WINDOW_HEIGHT, 1, DescriptorHeapInfo(m_rtUAVDescriptorHeap, 6)))) return false;
 
 		//store the info data and make it visible to the gpu
-		m_rtInfoData.ScreenDimensions.x = WINDOW_WIDTH;
-		m_rtInfoData.ScreenDimensions.y = WINDOW_HEIGHT;
+		m_rtInfoData.ScreenDimensions.x = RT_WINDOW_WIDTH;
+		m_rtInfoData.ScreenDimensions.y = RT_WINDOW_HEIGHT;
 		m_rtInfoData.MaxRaysPerPixel = MAX_RAYS_PER_PIXEL;
 		m_rtInfoData.NumSamples = 1;
 		m_rtGenerateImageInfoBuffer->UpdateAll(&m_rtInfoData);
@@ -823,7 +823,6 @@ namespace RT::GraphicsAPI
 		{
 			m_rtInfoData.NumSamples &= 0x7fffffff;
 		}
-		std::cout << m_rtInfoData.NumSamples << " Samples\n";
 		m_rtGenerateImageInfoBuffer->Update(&m_rtInfoData);
 
 		//the pass to generate the final image
@@ -840,7 +839,7 @@ namespace RT::GraphicsAPI
 		d3dUAVBarriers[1].UAV.pResource = m_rtOutputTexture->GetResource();
 		d3dCommandList->ResourceBarrier(2, d3dUAVBarriers);
 
-		d3dCommandList->Dispatch((WINDOW_WIDTH + 15) / 16, (WINDOW_HEIGHT + 15) / 16, 1);
+		d3dCommandList->Dispatch((RT_WINDOW_WIDTH + 15) / 16, (RT_WINDOW_HEIGHT + 15) / 16, 1);
 
 		d3dUAVBarriers[0].Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
 		d3dUAVBarriers[0].Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -898,7 +897,7 @@ namespace RT::GraphicsAPI
 		//create our GPU task schedulers
 		m_rtFrameScheduler = new GPUScheduler();
 		if (!m_rtFrameScheduler) return false;
-		if (!(m_rtFrameScheduler->Initialize(m_rtDevice, NUM_BUFFERS))) return false;
+		if (!(m_rtFrameScheduler->Initialize(m_rtDevice, RT_NUM_BUFFERS))) return false;
 
 		//create the descriptor and resource heaps
 		m_rtUAVDescriptorHeap = new DescriptorHeap();
@@ -929,7 +928,7 @@ namespace RT::GraphicsAPI
 		//create the class that handles the pass which renders a texture to the back buffer
 		m_rtFinalPass = new TextureToScreenPass();
 		if (!m_rtFinalPass) return false;
-		if (!(m_rtFinalPass->Initialize(m_rtFrameScheduler, WINDOW_WIDTH, WINDOW_HEIGHT, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB))) return false;
+		if (!(m_rtFinalPass->Initialize(m_rtFrameScheduler, RT_WINDOW_WIDTH, RT_WINDOW_HEIGHT, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB))) return false;
 
 
 		return true;
@@ -973,7 +972,6 @@ namespace RT::GraphicsAPI
 		if (!(m_rtTraceRays->Render(m_rtBuildBVH->GetBVH()))) return false;
 
 		//the pass to generate the final image
-		std::cout << iIteration << "\n";
 		if (!(m_rtImageGeneration->Render(iIteration == 0))) return false;
 
 		//the final pass

@@ -3,6 +3,7 @@
 #include <chrono>
 #include <thread>
 
+#include "Settings.h"
 #include "GPUDevice.h"
 #include "RaytracerPipeline.h"
 
@@ -11,28 +12,54 @@
 using namespace std::chrono_literals;
 
 
-//std::atomic_bool bAppShouldRun = true;
-//std::atomic_bool bAppRunning = true;
+std::atomic_bool bAppShouldRun = true;
+
+//run the rendering on a separate thread to increase application responsiveness
+void RenderFunction(RT::GraphicsAPI::RaytracerPipeline* rtTracer)
+{
+	while (bAppShouldRun)
+	{
+		if (!rtTracer->Render()) std::cout << "error\n";
+	}
+}
 
 
 
 int main()
 {
 	RT::GraphicsAPI::WND::Window rtWindow = RT::GraphicsAPI::WND::Window();
-	std::cout << rtWindow.Initialize(RT::GraphicsAPI::WINDOW_WIDTH, RT::GraphicsAPI::WINDOW_HEIGHT) << "\n";
-
 	RT::GraphicsAPI::DX12Device rtDevice = RT::GraphicsAPI::DX12Device();
-	std::cout << rtDevice.Initialize(&rtWindow, RT::GraphicsAPI::NUM_BUFFERS) << "\n";
-
 	RT::GraphicsAPI::RaytracerPipeline rtTracer = RT::GraphicsAPI::RaytracerPipeline();
-	std::cout << rtTracer.Initialize(&rtDevice, RT::GraphicsAPI::LoadMeshFromFile("assets/testobject5_1.obj")) << "\n";
-	
-	//std::thread(RenderFunction);
-	std::chrono::steady_clock stdClock;
 
+	//the initialization
+	if (!(rtWindow.Initialize(RT_WINDOW_WIDTH, RT_WINDOW_HEIGHT)))
+	{
+		std::cout << "An error occured during window initialization\n";
+		std::cin.get();
+		return 0;
+	}
+	if (!(rtDevice.Initialize(&rtWindow)))
+	{
+		std::cout << "An error occured during device initialization\n";
+		std::cin.get();
+		return 0;
+	}
+	if (!(rtTracer.Initialize(&rtDevice, RT::GraphicsAPI::LoadMeshFromFile(RT_SCENE_FILENAME))))
+	{
+		std::cout << "An error occured during pipeline initialization\n";
+		std::cin.get();
+		return 0;
+	}
+	
+	//std::chrono::steady_clock stdClock;
+	//the main loop
+	std::thread stdRenderThread(RenderFunction, &rtTracer);
 	while (!(rtWindow.ShouldClose()))
 	{
 		rtWindow.Update();
+		std::this_thread::sleep_for(1ms);
+
+		/*
 		//std::chrono::time_point<std::chrono::steady_clock, std::chrono::milliseconds> tp;
 		auto stdFirstTimePoint = stdClock.now();
 		if (!rtTracer.Render()) std::cout << "error\n";
@@ -40,21 +67,12 @@ int main()
 		unsigned int iElapsedTime = (std::chrono::duration_cast<std::chrono::microseconds>(stdSecondTimePoint - stdFirstTimePoint)).count();
 		//std::cout << (std::chrono::duration_cast<std::chrono::milliseconds>(stdSecondTimePoint - stdFirstTimePoint)) << "\n";
 		std::cout << (float)(iElapsedTime / 1000000.0f) << "\n";
+		*/
 	}
-	//bAppShouldRun = false;
+	bAppShouldRun = false;
 
 	//wait for the rendering to finish
-	//while (bAppRunning) {}
+	stdRenderThread.join();
 
 	return 0;
 }
-
-
-//void RenderFunction(RT::GraphicsAPI::RaytracerPipeline& rtTracer)
-//{
-//	while (bAppShouldRun)
-//	{
-//		if (!rtTracer.Render()) std::cout << "error\n";
-//	}
-//	bAppRunning = false;
-//}

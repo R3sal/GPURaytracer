@@ -31,7 +31,11 @@ namespace RT::GraphicsAPI
 			pData = stbi_load(sFileName.c_str(), &iWidth, &iHeight, &iNumComponents, iDesiredNumChannels);
 		}
 		if (iDesiredNumChannels > 0) iNumComponents = iDesiredNumChannels;
-		if ((!pData) || (iNumComponents < 1) || (iBytesPerChannel < 1) || (iWidth < 1) || (iHeight < 1)) return (TextureInfo)0;
+		if ((!pData) || (iNumComponents < 1) || (iBytesPerChannel < 1) || (iWidth < 1) || (iHeight < 1))
+		{
+			std::cout << "Error loading textures: " << stbi_failure_reason() << "\n";
+			return (TextureInfo)0;
+		}
 
 		unsigned int iMemorySize = (unsigned int)iWidth * (unsigned int)iHeight * (unsigned int)iNumComponents * (unsigned int)iBytesPerChannel;
 		TextureInfo rtTextureData{};
@@ -182,7 +186,7 @@ namespace RT::GraphicsAPI
 		tinyobj::ObjReader tolReader{};
 		if (!(tolReader.ParseFromFile(sFileName, tolReaderConfig)))
 		{
-			std::cout << tolReader.Error() << "\n";
+			std::cout << "Error loading scene: " << tolReader.Error() << "\n";
 			return (MeshInfo)0;
 		}
 

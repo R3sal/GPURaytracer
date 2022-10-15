@@ -11,15 +11,12 @@
 #pragma comment(lib, "dxgi")
 #pragma comment(lib, "d3d12")
 
+#define RT_NUM_BUFFERS 3
+
 
 
 namespace RT::GraphicsAPI
 {
-
-	const unsigned int NUM_BUFFERS = 3;
-	const unsigned int WINDOW_WIDTH = 960;
-	const unsigned int WINDOW_HEIGHT = 640;
-
 
 	class DX12Device
 	{
@@ -48,7 +45,7 @@ namespace RT::GraphicsAPI
 
 
 		//public class functions
-		bool Initialize(WND::Window* rtWindow, UINT iBufferCount = 1);
+		bool Initialize(WND::Window* rtWindow);
 		void Release();
 
 

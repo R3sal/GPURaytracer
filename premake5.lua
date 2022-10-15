@@ -36,7 +36,9 @@ project "GPURaytracer"
 
     links
     {
-        "GLFW/glfw3.lib"
+        "GLFW/glfw3.lib",
+        "dxgi.lib",
+        "d3d12.lib"
     }
 
     defines

@@ -7,10 +7,6 @@
 //include the window class
 #include "GLWindow.h"
 
-//link to the appropriate libraries
-#pragma comment(lib, "dxgi")
-#pragma comment(lib, "d3d12")
-
 #define RT_NUM_BUFFERS 3
 
 

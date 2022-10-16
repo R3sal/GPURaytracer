@@ -40,6 +40,7 @@ int main()
 		return 0;
 	}
 	std::cout << "The window was initialized successfully\n";
+
 	if (!(rtDevice.Initialize(&rtWindow)))
 	{
 		std::cout << "An error occured during device initialization\n";
@@ -47,6 +48,7 @@ int main()
 		return 0;
 	}
 	std::cout << "DirectX was initialized successfully\n";
+
 	if (!(rtTracer.Initialize(&rtDevice, RT::GraphicsAPI::LoadMeshFromFile(RT_SCENE_FILENAME))))
 	{
 		std::cout << "An error occured during pipeline initialization\n";

@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <algorithm>
 #include <iostream>
 #include <DirectXMath.h>
 #include "ShaderResources.h"
@@ -95,5 +96,28 @@ namespace RT::GraphicsAPI
 		uint64_t GetIndexCount() { return m_rtMesh.IndexCount; };
 		uint64_t GetVertexCount() { return m_rtMesh.VertexCount; };
 
+	};
+}
+
+namespace std
+{
+	template<>
+	struct hash<RT::GraphicsAPI::Vertex>
+	{
+		size_t operator()(const RT::GraphicsAPI::Vertex& key)
+		{
+			uint64_t iResult = 0;
+			iResult |= ((uint64_t)(key.Position.x * 32.0f) & 31);
+			iResult |= ((uint64_t)(key.Position.y * 32.0f) & 31) << 5;
+			iResult |= ((uint64_t)(key.Position.z * 32.0f) & 31) << 10;
+			iResult |= ((uint64_t)(key.Position.x * 0.000001f) & 128) << 15;
+			iResult |= ((uint64_t)(key.Position.y * 0.000001f) & 128) << 23;
+			iResult |= ((uint64_t)(key.Position.z * 0.000001f) & 128) << 31;
+			iResult |= ((uint64_t)(key.Normal.x * 512.0f) & 511) << 39;
+			iResult |= ((uint64_t)(key.Normal.y * 512.0f) & 511) << 48;
+			iResult |= ((uint64_t)(key.MaterialID / 2) & 255) << 57;
+			hash<string>()("f");
+			return iResult;
+		}
 	};
 }

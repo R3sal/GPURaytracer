@@ -48,6 +48,9 @@ namespace RT::GraphicsAPI
 
 		stbi_image_free(pData);
 
+		std::cout << "Successfully loaded a texture with following parameters:\n Width:           " << rtTextureData.Width << "\n Height:          "
+			<< rtTextureData.Height << "\n Bytes per pixel: " << (rtTextureData.BytesPerChannel * rtTextureData.ChannelCount) << "\n";
+
 		return rtTextureData;
 	}
 
@@ -370,6 +373,9 @@ namespace RT::GraphicsAPI
 			CalculateNormals(&rtMesh);
 		}
 		CalculateTangents(&rtMesh);
+
+		std::cout << "Successfully loaded the scene with:\n " << rtMesh.VertexCount << " vertices\n " << rtMesh.IndexCount << " indices\n "
+			<< rtMesh.MaterialCount << " materials\n " << (rtMesh.TextureNameCount - 1) << " textures\n";
 
 		return rtMesh;
 	}

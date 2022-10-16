@@ -19,8 +19,9 @@ void RenderFunction(RT::GraphicsAPI::RaytracerPipeline* rtTracer)
 {
 	while (bAppShouldRun)
 	{
-		if (!rtTracer->Render()) std::cout << "error\n";
+		if (!rtTracer->Render()) std::cout << "Error while rendering\n";
 	}
+	std::cout << "\nThe raytracer successfully finished computing the image\n";
 }
 
 
@@ -38,37 +39,43 @@ int main()
 		std::cin.get();
 		return 0;
 	}
+	std::cout << "The window was initialized successfully\n";
 	if (!(rtDevice.Initialize(&rtWindow)))
 	{
 		std::cout << "An error occured during device initialization\n";
 		std::cin.get();
 		return 0;
 	}
+	std::cout << "DirectX was initialized successfully\n";
 	if (!(rtTracer.Initialize(&rtDevice, RT::GraphicsAPI::LoadMeshFromFile(RT_SCENE_FILENAME))))
 	{
 		std::cout << "An error occured during pipeline initialization\n";
 		std::cin.get();
 		return 0;
 	}
+	std::cout << "The raytracer pipeline was initialized successfully\n\n";
+
+	//get a time point to measur the time, that passed since the start of the program
+	std::chrono::steady_clock stdClock;
+	auto stdStartTime = stdClock.now();
+
 	
-	//std::chrono::steady_clock stdClock;
 	//the main loop
 	std::thread stdRenderThread(RenderFunction, &rtTracer);
 	while (!(rtWindow.ShouldClose()))
 	{
+		//react to window events
 		rtWindow.Update();
 		std::this_thread::sleep_for(1ms);
 
-		/*
-		//std::chrono::time_point<std::chrono::steady_clock, std::chrono::milliseconds> tp;
-		auto stdFirstTimePoint = stdClock.now();
-		if (!rtTracer.Render()) std::cout << "error\n";
-		auto stdSecondTimePoint = stdClock.now();
-		unsigned int iElapsedTime = (std::chrono::duration_cast<std::chrono::microseconds>(stdSecondTimePoint - stdFirstTimePoint)).count();
-		//std::cout << (std::chrono::duration_cast<std::chrono::milliseconds>(stdSecondTimePoint - stdFirstTimePoint)) << "\n";
-		std::cout << (float)(iElapsedTime / 1000000.0f) << "\n";
-		*/
+		//stop the raytracer if we exceeded the time limit
+		auto stdCurrentTime = stdClock.now();
+		auto iElapsedTime = (std::chrono::duration_cast<std::chrono::microseconds>(stdCurrentTime - stdStartTime)).count();
+		if (((float)iElapsedTime * 0.000001f) >= RT_MAX_SECONDS)
+			bAppShouldRun = false;
 	}
+
+	//indicate, that the render thread should finish
 	bAppShouldRun = false;
 
 	//wait for the rendering to finish

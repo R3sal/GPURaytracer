@@ -11,6 +11,8 @@
 #define RT_AA_SAMPLE_SPREAD 1.5f; //anti-aliasing: the bigger the value, the blurrier the image, disabled at 0.0f, default is 1.0f
 #define RT_DOF_SAMPLE_SPREAD 0.0f; //depth of field: the bigger the value, the stronger the DOF effect, disabled at 0.0f, default is 1.0f
 #define RT_USE_BVH 1 //determines the usage of a bounding volume hierarchy (0: do not use BVH, 1: use BVH)
+#define RT_MAX_TIME 1e30f //can be used in the expression below
+#define RT_MAX_SECONDS 300.0f //the maximum time in seconds bofore the raytracer finishes (this can be very useful for tesing and comparisons)
 
 //camera settings
 #define RT_CAMERA_FOV 1.5707964f //the field of view of the camera in radians

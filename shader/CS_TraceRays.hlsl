@@ -1,4 +1,6 @@
 
+#include "../src/Settings.h" //for RT_USE_BVH
+
 #include "PerRayShading.hlsli"
 #include "Raytracer.hlsli"
 #include "Random.hlsli"
@@ -7,8 +9,6 @@
 #define GROUPSIZE_X 256
 #define GROUPSIZE_Y 1
 #define GROUPSIZE_Z 1
-
-#define USE_BVH 1
 
 
 struct TraceRaysInfo
@@ -155,7 +155,7 @@ void main(CSInput Input)
 		float4 Result = float4(CurrentRay.TMax, 0.0f, 0.0f, 0.0f);
 		uint3 CurrentIndices = uint3(0, 0, 0);
 		
-#if !USE_BVH //no use of BVH
+#if !RT_USE_BVH //no use of BVH
 		
 		for (uint i = 0; i < InfoBuffer.NumIndices; i += 3)
 		{

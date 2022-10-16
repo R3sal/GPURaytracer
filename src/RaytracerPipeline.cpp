@@ -904,12 +904,12 @@ namespace RT::GraphicsAPI
 		if (!(m_rtUAVDescriptorHeap->Initialize(m_rtFrameScheduler, 8, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV))) return false;
 		
 		CameraInfo rtCamera{};
-		rtCamera.VerticalFOV = 3.141592564f / 2.0f;
-		rtCamera.NearZ = 0.01f;
-		rtCamera.FarZ = 10000.0f;
-		rtCamera.Position = { -2.5f, 5.0f, -2.0f };
-		rtCamera.FocusPoint = { 0.0f, 0.0f, 0.0f };
-		rtCamera.UpDirection = { 0.0f, 1.0f, 0.0f };
+		rtCamera.VerticalFOV = RT_CAMERA_FOV;
+		rtCamera.NearZ = RT_CAMERA_NEARZ;
+		rtCamera.FarZ = RT_CAMERA_FARZ;
+		rtCamera.Position = RT_CAMERA_POSITION;
+		rtCamera.FocusPoint = RT_CAMERA_FOCUS_POINT;
+		rtCamera.UpDirection = RT_CAMERA_UP_DIRECTION;
 		m_rtCameraRayGen = new CameraRayGen();
 		if (!(m_rtCameraRayGen->Initialize(m_rtFrameScheduler, m_rtUAVDescriptorHeap, rtCamera))) return false;
 
@@ -946,6 +946,8 @@ namespace RT::GraphicsAPI
 		ID3D12GraphicsCommandList* d3dCommandList = m_rtFrameScheduler->GetCommandList();
 
 
+#if RT_USE_BVH
+
 		//building the bvh (only once)
 		static bool bBuildBVH = true;
 		if (bBuildBVH)
@@ -954,6 +956,8 @@ namespace RT::GraphicsAPI
 			if (!(m_rtBuildBVH->Build(m_rtTraceRays->GetMesh(), m_rtSortPrimitives->GetMortonCodes()))) return false;
 			bBuildBVH = false;
 		}
+
+#endif
 
 
 		//camera ray generation

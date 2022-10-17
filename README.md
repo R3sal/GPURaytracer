@@ -7,6 +7,8 @@ Build Instructions
 1. Download or clone the repository
 2. Run GenerateProject.bat to generate a Visual Studio 2022 Solution (if you are using a different code editor, you need to edit the file)
 
+Important: You need the Windows SDK, to run this app.
+
 
 Adjusting the Raytracing Properties
 -----------------------------------

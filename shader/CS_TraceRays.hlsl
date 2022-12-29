@@ -264,7 +264,7 @@ void main(CSInput Input)
 			ShadingInput.Normal = Interpolate(Vertex1.Normal, Vertex2.Normal, Vertex3.Normal, Result.yz);
 			ShadingInput.Tangent = Interpolate(Vertex1.Tangent, Vertex2.Tangent, Vertex3.Tangent, Result.yz);
 			ShadingInput.OldRayDirection = CurrentRay.Direction;
-			ShadingInput.NewRayDirection = RotatedRandomDirection(RNGSeed, ShadingInput.Normal);
+			ShadingInput.NewRayDirection = RotatedRandomDirection(RNGSeed, ShadingInput.Normal); //todo: add monte carlo integration method
 			ShadingInput.MaterialID = Vertex1.MaterialID;
 			
 			if (dot(OldRay.Direction, OldRay.Direction) == 0.0f) //this indicates it being the first rays for which we have to reset those values

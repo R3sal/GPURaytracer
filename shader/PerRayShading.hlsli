@@ -79,26 +79,26 @@ float3 SampleTexture(TextureID TextureSampleInfo, float2 UV)
 float3 ReflectedColor(float Roughness, float3 F0Color, float NdotL, float NdotV, float NdotH, float VdotH)
 {
 	//calculate an alpha value from the roughness
-float Alpha = Roughness * Roughness;
+	float Alpha = Roughness * Roughness;
 	
 	//calculate Fresnel
 	//F0 + (1.0f - F0) * pow(saturate(1.0f - VdotH), 5.0f);
-float ScalingFactor = pow(saturate(1.0f - VdotH), 5.0f);
-float3 F = F0Color + ScalingFactor - F0Color * ScalingFactor;
+	float ScalingFactor = pow(saturate(1.0f - VdotH), 5.0f);
+	float3 F = F0Color + ScalingFactor - F0Color * ScalingFactor;
 	
 	//calculate the NDF
 	//a2 / (PI * pow((NdotH * NdotH) * (a2 - 1.0f) + 1.0f, 2.0f) + EPSILON);
-float a2 = Alpha * Alpha;
-float NdotH2 = NdotH * NdotH;
-float SqrtDenominator = NdotH2 * a2 - NdotH2 + 1.0f;
-float DDenominator = PI * SqrtDenominator * SqrtDenominator; // the a2 is added in the final calculation
+	float a2 = Alpha * Alpha;
+	float NdotH2 = NdotH * NdotH;
+	float SqrtDenominator = NdotH2 * a2 - NdotH2 + 1.0f;
+	float DDenominator = PI * SqrtDenominator * SqrtDenominator; // the a2 is added in the final calculation
 	
 	//calculate the visibility term
 	//(NdotV * NdotL) / ((NdotV * (1.0f - k) + k) * (NdotL * (1.0f - k) + k))
-float k = Alpha * 0.5f;
-float2 DotProducts = float2(NdotV, NdotL);
-float2 PartialGDenominators = (DotProducts - k * DotProducts + k);
-float GDenominator = PartialGDenominators.x * PartialGDenominators.y; // NdotV * NdotL is cancelled out by the normalization factor
+	float k = Alpha * 0.5f;
+	float2 DotProducts = float2(NdotV, NdotL);
+	float2 PartialGDenominators = (DotProducts - k * DotProducts + k);
+	float GDenominator = PartialGDenominators.x * PartialGDenominators.y; // NdotV * NdotL is cancelled out by the normalization factor
 	
 	
 	//normalization factor: 1.0f / (4.0f * NdotL * NdotV)

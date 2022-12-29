@@ -75,59 +75,61 @@ float3 SampleTexture(TextureID TextureSampleInfo, float2 UV)
 
 
 //shading functions
-//a fresnel term
-float3 Fresnel_Schlick(float VdotH, float3 F0)
-{
-	return F0 + (1.0f - F0) * pow(saturate(1.0f - VdotH), 5.0f);
-}
-
-//a normal distribution function
-float NDF_TrowbridgeReitz(float NdotH, float Roughness)
-{
-	float a2 = pow(Roughness, 4.0f);
-	
-	float Denominator = (NdotH * NdotH) * (a2 - 1.0f) + 1.0f;
-	
-	return a2 / (PI * Denominator * Denominator + EPSILON);
-}
-
-//a visibility term
-float VT_Schlick(float NdotV, float NdotL, float Roughness)
-{
-	float k = (Roughness * Roughness) * 0.5f;
-	
-	float G_V = NdotV / (NdotV * (1.0f - k) + 1.0f);
-	float G_L = NdotL / (NdotL * (1.0f - k) + 1.0f);
-	
-	return G_V * G_L;
-}
-
 //calculate the specular contribution
 float3 ReflectedColor(float Roughness, float3 F0Color, float NdotL, float NdotV, float NdotH, float VdotH)
 {
-	float3 F = Fresnel_Schlick(VdotH, F0Color);
-	float D = NDF_TrowbridgeReitz(NdotH, Roughness);
-	float G = VT_Schlick(NdotV, NdotL, Roughness);
-	float NormalizationFactor = 4.0f * NdotL * NdotV + EPSILON;
+	//calculate an alpha value from the roughness
+float Alpha = Roughness * Roughness;
 	
-	return (F * D * G) / NormalizationFactor;
+	//calculate Fresnel
+	//F0 + (1.0f - F0) * pow(saturate(1.0f - VdotH), 5.0f);
+float ScalingFactor = pow(saturate(1.0f - VdotH), 5.0f);
+float3 F = F0Color + ScalingFactor - F0Color * ScalingFactor;
+	
+	//calculate the NDF
+	//a2 / (PI * pow((NdotH * NdotH) * (a2 - 1.0f) + 1.0f, 2.0f) + EPSILON);
+float a2 = Alpha * Alpha;
+float NdotH2 = NdotH * NdotH;
+float SqrtDenominator = NdotH2 * a2 - NdotH2 + 1.0f;
+float DDenominator = PI * SqrtDenominator * SqrtDenominator; // the a2 is added in the final calculation
+	
+	//calculate the visibility term
+	//(NdotV * NdotL) / ((NdotV * (1.0f - k) + k) * (NdotL * (1.0f - k) + k))
+float k = Alpha * 0.5f;
+float2 DotProducts = float2(NdotV, NdotL);
+float2 PartialGDenominators = (DotProducts - k * DotProducts + k);
+float GDenominator = PartialGDenominators.x * PartialGDenominators.y; // NdotV * NdotL is cancelled out by the normalization factor
+	
+	
+	//normalization factor: 1.0f / (4.0f * NdotL * NdotV)
+	return (0.25f * F * a2) / (DDenominator * GDenominator + EPSILON); // NdotL * NdotV is cancelled out by the visibility term
 }
 
+
 //calculate the diffuse contribution (from https://www.gdcvault.com/play/1024478/PBR-Diffuse-Lighting-for-GGX)
-float3 RefractedColor(float Roughness, float Metallic, float3 Albedo, float NdotL, float NdotV, float NdotH, float LdotV)
+float3 RefractedColor(float Roughness, float Metallic, float3 Albedo, float NdotL, float NdotV, float VdotH, float LdotV)
 {
-	//todo: fix artifacts (currently using lambertian model)
+	//diffuse GGX approximation
+	/*
 	float Alpha = Roughness * Roughness;
 	float Facing = 0.5f + 0.5f * LdotV;
-	
-	float Rough = Facing * (0.9f - 0.4f * Facing) * ((0.5f + NdotH) / (NdotH + EPSILON));
+	float Rough = Facing * (0.9f - 0.4f * Facing) * (0.5f + NdotH) / (NdotH + EPSILON);
+	float Smooth = 1.05f * (1.0f - pow(1.0f - NdotL, 5.0f)) * (1.0f - pow(1.0f - NdotV, 5.0f));
+	float Single = lerp(Smooth, Rough, Alpha) / PI;
+	float Multi = 0.1159 * Alpha;
+	return (Albedo * (Single + Albedo * Multi)) * (1.0f - Metallic);
+	*/
+	float Facing = LdotV * 0.5f + 0.5f;
+	float PartialRough = Facing * (0.9f - 0.4f * Facing);
+	float Rough = PartialRough * (VdotH / (NdotL + NdotV + EPSILON)) + PartialRough;
 	float Smooth = 1.05f * (1.0f - pow(1.0f - NdotL, 5.0f)) * (1.0f - pow(1.0f - NdotV, 5.0f));
 	
+	float Alpha = Roughness * Roughness;
 	float Single = lerp(Smooth, Rough, Alpha) / PI;
 	float Multi = 0.1159 * Alpha;
 	
-	return (Albedo / PI) * (1.0f - Metallic);
-	//return (Albedo * (Albedo * Multi + Single)) * (1.0f - Metallic);
+	float3 Diffuse = Albedo * (Albedo * Multi + Single);
+	return Diffuse - Diffuse * Metallic;
 }
 
 
@@ -157,7 +159,7 @@ ShaderOutput Shader(ShaderInput Input, float3 ScatteredLight, float3 EmittedLigh
 	float LdotV = saturate(dot(L, V));
 	
 	float3 Fr = ReflectedColor(CurrentMaterial.Roughness, CurrentMaterial.F0Color, NdotL, NdotV, NdotH, VdotH);
-	float3 Fd = RefractedColor(CurrentMaterial.Roughness, CurrentMaterial.Metallic, CurrentMaterial.Albedo, NdotL, NdotV, NdotH, LdotV);
+	float3 Fd = RefractedColor(CurrentMaterial.Roughness, CurrentMaterial.Metallic, CurrentMaterial.Albedo, NdotL, NdotV, VdotH, LdotV);
 
 	/*
 	S: scattered light on one ray = (Fr + Fd) * NdotL

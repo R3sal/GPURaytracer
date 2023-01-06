@@ -12,7 +12,7 @@ Important: You need the Windows SDK, to run this app.
 
 Adjusting the Raytracing Properties
 -----------------------------------
-In the Settings.h file are all properties of the raytracer, such as window width and height.
+In the Settings.h file are all properties of the raytracer, such as window width and height.  
 You can simply customize them and then just recompile the project.
 
 

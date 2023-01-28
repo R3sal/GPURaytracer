@@ -255,6 +255,7 @@ namespace RT::GraphicsAPI
 			rtIndices[i] = iNumUniqueVertices;
 			bool bVertexUnique = true;
 
+			/* !!! this is currently too slow !!!
 			for (uint64_t j = 0; j < iNumUniqueVertices; j++)
 			{
 				if (VerticesAreEqual(rtVertices[i], rtUniqueVertices[j]))
@@ -263,7 +264,7 @@ namespace RT::GraphicsAPI
 					bVertexUnique = false;
 					break;
 				}
-			}
+			}*/
 
 			if (bVertexUnique)
 			{
@@ -286,9 +287,16 @@ namespace RT::GraphicsAPI
 			rtMaterials[i].Albedo.y = tolCurrentMaterial.diffuse[1];
 			rtMaterials[i].Albedo.z = tolCurrentMaterial.diffuse[2];
 
-			float fRoughness = tolCurrentMaterial.shininess;
-			//converts shininess to a value between 0 and 1, which is better suited for the PBR lighting model
-			fRoughness = 1.0f - ((fRoughness > 1.0f) ? (log2(min(max(tolCurrentMaterial.shininess, 1.0f), 1448.15f)) / 10.5f) : fRoughness);
+			float fRoughness = 0.0f;
+			if (tolCurrentMaterial.shininess == 1.0f)
+			{
+				fRoughness = tolCurrentMaterial.roughness;
+			}
+			else
+			{
+				//converts shininess to a value between 0 and 1, which is better suited for the PBR lighting model
+				fRoughness = 1.0f - (log2(min(max(tolCurrentMaterial.shininess, 1.0f), 1448.15f)) / 10.5f);
+			}
 
 			rtMaterials[i].Roughness = fRoughness;
 			rtMaterials[i].F0Color.x = tolCurrentMaterial.specular[0];

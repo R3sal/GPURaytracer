@@ -2,7 +2,6 @@
 
 #include <string>
 #include <unordered_map>
-#include <algorithm>
 #include <iostream>
 #include <DirectXMath.h>
 #include "ShaderResources.h"

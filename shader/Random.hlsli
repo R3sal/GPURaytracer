@@ -1,33 +1,6 @@
 
-//implements a basic xorshift algorithm for pseudo random numbers: http://www.jstatsoft.org/v08/i14/paper
-uint1 XorShift(inout uint1 Seed)
-{
-	Seed ^= Seed << 13;
-	Seed ^= Seed >> 17;
-	Seed ^= Seed << 5;
-	return Seed;
-}
-uint2 XorShift(inout uint2 Seed)
-{
-	Seed ^= Seed << 13;
-	Seed ^= Seed >> 17;
-	Seed ^= Seed << 5;
-	return Seed;
-}
-uint3 XorShift(inout uint3 Seed)
-{
-	Seed ^= Seed << 13;
-	Seed ^= Seed >> 17;
-	Seed ^= Seed << 5;
-	return Seed;
-}
-uint4 XorShift(inout uint4 Seed)
-{
-	Seed ^= Seed << 13;
-	Seed ^= Seed >> 17;
-	Seed ^= Seed << 5;
-	return Seed;
-}
+#pragma once
+
 
 //gives the output in the gaussian distribution for a given input
 float1 GaussianDistribution(float1 Input, float1 Mean, float1 StandartDeviation)
@@ -59,22 +32,44 @@ float4 GaussianDistribution(float4 Input, float4 Mean, float4 StandartDeviation)
 	return ScaleFactor * exp(-0.5f * Exponent * Exponent);
 }
 
-//returns a random number between 0 and 1 using the xorshift algorithm
+//returns a random number between 0 and 1 using a permuted congruental generator (pcg): https://www.reedbeta.com/blog/hash-functions-for-gpu-rendering/
 float1 Random(inout uint1 Seed)
 {
-	return saturate(float1(XorShift(Seed)) * 2.3283064e-10f);
+	uint State = Seed * 747796405 + 2891336453;
+	uint Word = ((State >> ((State >> 28) + 4)) ^ State) * 277803737;
+	Seed = (Word >> 22) ^ Word;
+	return saturate(float1(Seed) * 2.3283064e-10f); // = Seed / 2^32 = random integer / max integer
 }
+//returns a multiple random numbers between 0 and 1 using a multidimensional permuted congruental generator (pcg): https://jcgt.org/published/0009/03/02/paper.pdf
 float2 Random(inout uint2 Seed)
 {
-	return saturate(float2(XorShift(Seed)) * 2.3283064e-10f);
+	uint3 State = uint3(Seed, 17);
+	State = State * 1664525 + 1013904223;
+	State += State.yzx * State.zxy;
+	State ^= State >> 16;
+	State += State.yzx * State.zxy;
+	Seed = State.xy;
+	return saturate(float2(Seed) * 2.3283064e-10f);
 }
 float3 Random(inout uint3 Seed)
 {
-	return saturate(float3(XorShift(Seed)) * 2.3283064e-10f);
+	uint3 State = Seed;
+	State = State * 1664525 + 1013904223;
+	State += State.yzx * State.zxy;
+	State ^= State >> 16;
+	State += State.yzx * State.zxy;
+	Seed = State;
+	return saturate(float3(Seed) * 2.3283064e-10f);
 }
 float4 Random(inout uint4 Seed)
 {
-	return saturate(float4(XorShift(Seed)) * 2.3283064e-10f);
+	uint4 State = Seed;
+	State = State * 1664525 + 1013904223;
+	State += State.yzxy * State.wxyz;
+	State ^= State >> 16;
+	State += State.yzxy * State.wxyz;
+	Seed = State;
+	return saturate(float4(Seed) * 2.3283064e-10f);
 }
 
 //returns a random number in a gaussian distribution

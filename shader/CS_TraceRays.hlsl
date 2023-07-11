@@ -252,9 +252,7 @@ void main(CSInput Input)
 			Vertex Vertex3 = Vertices[CurrentIndices.z];
 			
 			//initialize the random number generation seed
-			uint3 RNGSeed = Input.GlobalThreadID.xxx;
-			RNGSeed *= RNGSeed + 17;
-			XorShift(RNGSeed);
+			uint3 RNGSeed = Input.GlobalThreadID.xyz;
 			RNGSeed += InfoBuffer.RNGSeed;
 			
 			//generate an input for our shader function
